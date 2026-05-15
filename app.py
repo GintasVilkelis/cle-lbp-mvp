@@ -27,18 +27,28 @@ with st.form("lbp_form"):
     )
     location = st.selectbox(
         "Pain location",
-        ["Central", "Unilateral", "Bilateral", "Radiating to leg"]
+        [
+            "Central",
+            "Left-sided",
+            "Right-sided",
+            "Bilateral (left worse)",
+            "Bilateral (right worse)",
+            "Radiating to left leg",
+            "Radiating to right leg",
+            "Radiating to both legs"
+        ]
     )
 
     st.subheader("Red flag screening")
-    recent_trauma = st.selectbox("Recent significant trauma (e.g. fall, accident)?", ["No", "Yes"])
+    recent_trauma = st.selectbox("Recent significant trauma?", ["No", "Yes"])
+    minor_trauma_elderly = st.selectbox("Minor trauma in older adult?", ["No", "Yes"])
     cancer_history = st.selectbox("History of cancer?", ["No", "Yes"])
     weight_loss = st.selectbox("Unexplained weight loss?", ["No", "Yes"])
-    infection_signs = st.selectbox("Fever or signs of systemic infection?", ["No", "Yes"])
-    steroid_use = st.selectbox("Prolonged corticosteroid use?", ["No", "Yes"])
+    night_pain = st.selectbox("Night pain or pain at rest?", ["No", "Yes"])
+    infection_signs = st.selectbox("Fever or recent infection?", ["No", "Yes"])
     iv_drug_use = st.selectbox("IV drug use?", ["No", "Yes"])
     immunosuppression = st.selectbox("Immunosuppression?", ["No", "Yes"])
-    night_pain = st.selectbox("Severe night pain or pain at rest?", ["No", "Yes"])
+    steroid_use = st.selectbox("Prolonged corticosteroid use?", ["No", "Yes"])
     neuro_deficit = st.selectbox("Progressive neurological deficit?", ["No", "Yes"])
     bladder_bowel = st.selectbox("Bladder/bowel dysfunction or saddle anaesthesia?", ["No", "Yes"])
 
