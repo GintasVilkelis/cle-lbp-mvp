@@ -1,25 +1,10 @@
 from typing import Dict, Any
 
-# Import your real engine logic here
-# Example:
-# from lbp_engine_core import run_lbp_engine
-
 def assess_low_back_pain(payload: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Wrapper that:
-    1. Accepts validated input from FastAPI/Streamlit
-    2. Calls your real LBP engine
-    3. Transforms the engine output into the API response format
-    """
-
-    # TODO: Replace this with your real engine call
-    # engine_result = run_lbp_engine(payload)
-
-    # For now, simulate dynamic behaviour:
     red_flags = []
     conditions = []
 
-    # Example dynamic logic:
+    # --- RED FLAGS ---
     if payload["red_flags"]["infection_signs"] == "Yes":
         red_flags.append({
             "code": "RF_INFECTION",
@@ -27,6 +12,21 @@ def assess_low_back_pain(payload: Dict[str, Any]) -> Dict[str, Any]:
             "reason": "Fever or systemic infection signs"
         })
 
+    if payload["red_flags"]["bladder_bowel"] == "Yes":
+        red_flags.append({
+            "code": "RF_CES",
+            "label": "Possible cauda equina syndrome",
+            "reason": "Bladder/bowel dysfunction or saddle anaesthesia"
+        })
+
+    if payload["red_flags"]["cancer_history"] == "Yes":
+        red_flags.append({
+            "code": "RF_MALIGNANCY",
+            "label": "Possible malignancy",
+            "reason": "History of cancer"
+        })
+
+    # --- CONDITIONS ---
     if payload["pain"]["duration"] == "> 12 weeks":
         conditions.append({
             "code": "CHRONIC_LBP",
@@ -51,13 +51,14 @@ def assess_low_back_pain(payload: Dict[str, Any]) -> Dict[str, Any]:
             }
         })
 
+    # --- SUMMARY ---
     summary = (
         "Red flags detected — urgent assessment recommended."
         if red_flags else
         "No red flags detected. Likely non-specific low back pain."
     )
 
-    # Explanation mode
+    # --- EXPLANATION MODE ---
     question_explanations = None
     if payload["mode"] == "teaching":
         question_explanations = {
