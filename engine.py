@@ -40,16 +40,28 @@ def assess_low_back_pain(payload: Dict[str, Any]) -> Dict[str, Any]:
         })
 
     if not conditions:
-        conditions.append({
-            "code": "NSLBP",
-            "name": "Non-specific low back pain",
-            "likelihood": "medium",
-            "reasons": ["No red flags detected"],
-            "routing": {
-                "level": "primary_care",
-                "description": "Conservative management recommended."
-            }
-        })
+        if red_flags:
+            conditions.append({
+                "code": "UNSPECIFIED_WITH_REDFLAGS",
+                "name": "Low back pain with red flags",
+                "likelihood": "undetermined",
+                "reasons": [rf["label"] for rf in red_flags],
+                "routing": {
+                    "level": "urgent_care",
+                    "description": "Urgent clinical assessment recommended due to red flags."
+                }
+            })
+        else:
+            conditions.append({
+                "code": "NSLBP",
+                "name": "Non-specific low back pain",
+                "likelihood": "medium",
+                "reasons": ["No red flags detected"],
+                "routing": {
+                    "level": "primary_care",
+                    "description": "Conservative management recommended."
+                }
+            })
 
     # --- SUMMARY ---
     summary = (
