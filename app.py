@@ -1,8 +1,10 @@
 # app.py
 import streamlit as st
 from typing import Dict, Any
+import importlib
+import engine
+importlib.reload(engine)
 from engine import assess_low_back_pain  # your engine module
-
 
 st.set_page_config(page_title="Low Back Pain Assessment", layout="centered")
 
