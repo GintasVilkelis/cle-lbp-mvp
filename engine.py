@@ -1,88 +1,69 @@
 from typing import Dict, Any
+from cle_lbp import run_lbp_engine  # import your full NICE engine
+
 
 def assess_low_back_pain(payload: Dict[str, Any]) -> Dict[str, Any]:
-    red_flags = []
-    conditions = []
+    """
+    Wrapper between Streamlit/FastAPI and the full NICE LBP engine.
 
-    # --- RED FLAGS ---
-    if payload["red_flags"]["infection_signs"] == "Yes":
-        red_flags.append({
-            "code": "RF_INFECTION",
-            "label": "Possible spinal infection",
-            "reason": "Fever or systemic infection signs"
-        })
+    1. Accepts validated input from the UI (payload)
+    2. Adapts it to the engine's expected input format
+    3. Calls run_lbp_engine(...)
+    4. Adapts the engine's output to the API response format used by app.py
+    """
 
-    if payload["red_flags"]["bladder_bowel"] == "Yes":
-        red_flags.append({
-            "code": "RF_CES",
-            "label": "Possible cauda equina syndrome",
-            "reason": "Bladder/bowel dysfunction or saddle anaesthesia"
-        })
-
-    if payload["red_flags"]["cancer_history"] == "Yes":
-        red_flags.append({
-            "code": "RF_MALIGNANCY",
-            "label": "Possible malignancy",
-            "reason": "History of cancer"
-        })
-
-    # --- CONDITIONS ---
-    if payload["pain"]["duration"] == "> 12 weeks":
-        conditions.append({
-            "code": "CHRONIC_LBP",
-            "name": "Chronic low back pain",
-            "likelihood": "high",
-            "reasons": ["Pain duration > 12 weeks"],
-            "routing": {
-                "level": "primary_care",
-                "description": "Consider physiotherapy and pain management."
-            }
-        })
-
-    if not conditions:
-        if red_flags:
-            conditions.append({
-                "code": "UNSPECIFIED_WITH_REDFLAGS",
-                "name": "Low back pain with red flags",
-                "likelihood": "undetermined",
-                "reasons": [rf["label"] for rf in red_flags],
-                "routing": {
-                    "level": "urgent_care",
-                    "description": "Urgent clinical assessment recommended due to red flags."
-                }
-            })
-        else:
-            conditions.append({
-                "code": "NSLBP",
-                "name": "Non-specific low back pain",
-                "likelihood": "medium",
-                "reasons": ["No red flags detected"],
-                "routing": {
-                    "level": "primary_care",
-                    "description": "Conservative management recommended."
-                }
-            })
-
-    # --- SUMMARY ---
-    summary = (
-        "Red flags detected — urgent assessment recommended."
-        if red_flags else
-        "No red flags detected. Likely non-specific low back pain."
-    )
-
-    # --- EXPLANATION MODE ---
-    question_explanations = None
-    if payload["mode"] == "teaching":
-        question_explanations = {
-            "recent_trauma": "Screens for fracture risk.",
-            "cancer_history": "Screens for malignancy.",
-            "infection_signs": "Screens for spinal infection.",
-            "bladder_bowel": "Screens for cauda equina syndrome."
-        }
-
-    return {
-        "summary": summary,
-        "red_flags": red_flags,
-        "conditions": conditions,
-        "question_explanations": question_explanations
+    # 1) Adapt UI payload → engine input format
+    engine_input: Dict[str, Any] = {
+        "mode": payload["mode"],          # "teaching" or "pro"
+        "patient": payload["patient"],    # age, sex
+        "pain": payload["pain"],          # duration, onset, location
+        "red_flags": payload["red_flags"] # all red flag answers
     }
+
+    # 2) Call the full NICE engine
+    engine_result: Dict[str, Any] = run_lbp_engine(engine_input)
+
+    # We now assume engine_result looks something like:
+    # {
+    #   "summary": str,
+    #   "red_flags": [ { "code": ..., "label": ..., "reason": ... }, ... ],
+    #   "conditions": [
+    #       {
+    #           "code": ...,
+    #           "name": ...,
+    #           "likelihood": "low|medium|high",
+    #           "reasons": [...],
+    #           "routing": {
+    #               "level": "self_care|primary_care|urgent_care|emergency",
+    #               "description": str
+    #           },
+    #           "severity": int,          # optional
+    #           "score": float            # optional
+    #       },
+    #       ...
+    #   ],
+    #   "reasoning_trace": [...],         # optional
+    #   "question_explanations": {...}    # optional
+    # }
+
+    # 3) Adapt engine_result → API response format expected by app.py
+    # Right now, app.py expects:
+    # {
+    #   "summary": str,
+    #   "red_flags": [...],
+    #   "conditions": [...],
+    #   "question_explanations": Optional[dict]
+    # }
+
+    response: Dict[str, Any] = {
+        "summary": engine_result.get("summary", ""),
+        "red_flags": engine_result.get("red_flags", []),
+        "conditions": engine_result.get("conditions", []),
+        "question_explanations": engine_result.get("question_explanations", None)
+    }
+
+    # Later, we can extend app.py to also show:
+    # - engine_result["reasoning_trace"]
+    # - severity, scores, etc.
+
+    return response
