@@ -535,7 +535,13 @@ def run_lbp_engine(input_data: Dict[str, Any]) -> Dict[str, Any]:
         "urinary_retention": yn(rf.get("urinary_retention", "No")),
         "urinary_incontinence": yn(rf.get("urinary_incontinence", "No")),
         "saddle_anaesthesia": yn(rf.get("saddle_anaesthesia", "No")),
-        "bowel_incontinence": yn(rf.get("bowel_incontinence", "No")),
+                
+        # Temporary mapping until UI has separate CES questions
+        "urinary_retention": yn(rf.get("bladder_bowel", "No")),
+        "urinary_incontinence": yn(rf.get("bladder_bowel", "No")),
+        "saddle_anaesthesia": yn(rf.get("bladder_bowel", "No")),
+        "bowel_incontinence": yn(rf.get("bladder_bowel", "No")),
+                
         "progressive_leg_weakness": yn(rf.get("neuro_deficit", "No")),
         "bilateral_leg_weakness": False,  # UI does not yet collect this
         "no_relief_when_lying_down": yn(rf.get("night_pain", "No")),
