@@ -532,17 +532,17 @@ def run_lbp_engine(input_data: Dict[str, Any]) -> Dict[str, Any]:
     def yn(x): return True if x == "Yes" else False
 
     state.update({
-        # "urinary_retention": yn(rf.get("urinary_retention", "No")),
-        # "urinary_incontinence": yn(rf.get("urinary_incontinence", "No")),
-        # "saddle_anaesthesia": yn(rf.get("saddle_anaesthesia", "No")),
-        # "bowel_incontinence": yn(rf.get("bowel_incontinence", "No")),
-        
         # Temporary mapping until UI has separate CES questions
-        "urinary_retention": yn(rf.get("bladder_bowel", "No")),
-        "urinary_incontinence": yn(rf.get("bladder_bowel", "No")),
-        "saddle_anaesthesia": yn(rf.get("bladder_bowel", "No")),
-        "bowel_incontinence": yn(rf.get("bladder_bowel", "No")),
-                
+        # "urinary_retention": yn(rf.get("bladder_bowel", "No")),
+        # "urinary_incontinence": yn(rf.get("bladder_bowel", "No")),
+        # "saddle_anaesthesia": yn(rf.get("bladder_bowel", "No")),
+        #"bowel_incontinence": yn(rf.get("bladder_bowel", "No")),
+        # Back to permanent mapping with separate questions:
+        "urinary_retention": yn(rf.get("urinary_retention", "No")),
+        "urinary_incontinence": yn(rf.get("urinary_incontinence", "No")),
+        "saddle_anaesthesia": yn(rf.get("saddle_anaesthesia", "No")),
+        "bowel_incontinence": yn(rf.get("bowel_incontinence", "No")),
+        
         "progressive_leg_weakness": yn(rf.get("neuro_deficit", "No")),
         "bilateral_leg_weakness": False,  # UI does not yet collect this
         "no_relief_when_lying_down": yn(rf.get("night_pain", "No")),
@@ -591,20 +591,53 @@ def run_lbp_engine(input_data: Dict[str, Any]) -> Dict[str, Any]:
                 "label": "Possible vertebral fracture",
                 "reason": "Fracture risk factors present"
             })
+    
+    CONDITION_METADATA = {
+        "suspected_cauda_equina": {
+            "name": "Suspected Cauda Equina Syndrome",
+            "routing": "Emergency referral to hospital"
+        },
+        "suspected_spinal_infection": {
+            "name": "Suspected Spinal Infection (Discitis/Osteomyelitis)",
+            "routing": "Urgent referral"
+        },
+        "suspected_malignancy": {
+            "name": "Suspected Spinal Malignancy",
+            "routing": "Urgent referral"
+        },
+        "suspected_vertebral_fracture": {
+            "name": "Suspected Vertebral Fracture",
+            "routing": "Urgent imaging"
+        },
+        "radicular_pain": {
+            "name": "Radicular Pain (Sciatica)",
+            "routing": "Primary care with safety‑netting"
+        },
+        "likely_mechanical_lbp": {
+            "name": "Likely Non‑Specific Mechanical Low Back Pain",
+            "routing": "Primary care / self‑care"
+        }
+    }
 
     # 4. Build conditions list
     conditions_output = []
     for cat in result.categories:
+        meta = CONDITION_METADATA.get(cat, {
+            "name": cat.replace("_", " ").title(),
+            "routing": "Primary care"
+        })
+
         conditions_output.append({
             "code": cat,
-            "name": cat.replace("_", " ").title(),
+            "name": meta["name"],
             "likelihood": "high",
             "reasons": [cat],
             "routing": {
-                "level": "urgent_care" if "suspected" in cat else "primary_care",
-                "description": result.recommendations[-1] if result.recommendations else ""
+                "level": meta["routing"],
+                "description": result.recommendations[-1] if result.recommendations else meta["routing"]
             }
         })
+
 
     # 5. Build summary
     summary = (

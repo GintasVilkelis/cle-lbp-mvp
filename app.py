@@ -109,3 +109,19 @@ if submitted:
             for r in cond["reasons"]:
                 st.markdown(f"- {r}")
         st.markdown("---")
+        
+        # INSERT HERE
+        if "reasoning_trace" in result and result["reasoning_trace"]:
+            with st.expander("Show clinical reasoning trace"):
+                for line in result["reasoning_trace"]:
+                    st.markdown(f"- {line}")
+        
+        import json
+        report = json.dumps(result, indent=2)
+        st.download_button(
+            label="Download full report",
+            data=report,
+            file_name="lbp_assessment.json",
+            mime="application/json"
+        )
+
