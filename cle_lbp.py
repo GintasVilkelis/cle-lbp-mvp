@@ -532,10 +532,11 @@ def run_lbp_engine(input_data: Dict[str, Any]) -> Dict[str, Any]:
     def yn(x): return True if x == "Yes" else False
 
     state.update({
-        "urinary_retention": yn(rf.get("urinary_retention", "No")),
-        "urinary_incontinence": yn(rf.get("urinary_incontinence", "No")),
-        "saddle_anaesthesia": yn(rf.get("saddle_anaesthesia", "No")),
-                
+        # "urinary_retention": yn(rf.get("urinary_retention", "No")),
+        # "urinary_incontinence": yn(rf.get("urinary_incontinence", "No")),
+        # "saddle_anaesthesia": yn(rf.get("saddle_anaesthesia", "No")),
+        # "bowel_incontinence": yn(rf.get("bowel_incontinence", "No")),
+        
         # Temporary mapping until UI has separate CES questions
         "urinary_retention": yn(rf.get("bladder_bowel", "No")),
         "urinary_incontinence": yn(rf.get("bladder_bowel", "No")),
