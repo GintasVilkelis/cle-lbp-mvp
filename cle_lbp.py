@@ -531,11 +531,13 @@ def run_lbp_engine(input_data: Dict[str, Any]) -> Dict[str, Any]:
     rf = input_data["red_flags"]
     def yn(x): return True if x == "Yes" else False
 
+    # Support both:
+    # - CES page (separate fields)
+    # - main app page (combined bladder_bowel question)
+    bladder_bowel = rf.get("bladder_bowel", "No")
+    
     state.update({
-        # Support both:
-        # - CES page (separate fields)
-        # - main app page (combined bladder_bowel question)
-        bladder_bowel = rf.get("bladder_bowel", "No")
+        # CES red flags
         "urinary_retention": yn(rf.get("urinary_retention", bladder_bowel)),
         "urinary_incontinence": yn(rf.get("urinary_incontinence", bladder_bowel)),
         "saddle_anaesthesia": yn(rf.get("saddle_anaesthesia", bladder_bowel)),
