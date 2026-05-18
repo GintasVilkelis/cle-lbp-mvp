@@ -532,17 +532,23 @@ def run_lbp_engine(input_data: Dict[str, Any]) -> Dict[str, Any]:
     def yn(x): return True if x == "Yes" else False
 
     state.update({
-        # Temporary mapping until UI has separate CES questions
-        # "urinary_retention": yn(rf.get("bladder_bowel", "No")),
-        # "urinary_incontinence": yn(rf.get("bladder_bowel", "No")),
-        # "saddle_anaesthesia": yn(rf.get("bladder_bowel", "No")),
-        #"bowel_incontinence": yn(rf.get("bladder_bowel", "No")),
-        # Back to permanent mapping with separate questions:
-        "urinary_retention": yn(rf.get("urinary_retention", "No")),
-        "urinary_incontinence": yn(rf.get("urinary_incontinence", "No")),
-        "saddle_anaesthesia": yn(rf.get("saddle_anaesthesia", "No")),
-        "bowel_incontinence": yn(rf.get("bowel_incontinence", "No")),
-        
+        # Support both:
+        # - CES page (separate fields)
+        # - main app page (combined bladder_bowel question)
+        bladder_bowel = rf.get("bladder_bowel", "No")
+        "urinary_retention": yn(rf.get("urinary_retention", bladder_bowel)),
+        "urinary_incontinence": yn(rf.get("urinary_incontinence", bladder_bowel)),
+        "saddle_anaesthesia": yn(rf.get("saddle_anaesthesia", bladder_bowel)),
+        "bowel_incontinence": yn(rf.get("bowel_incontinence", bladder_bowel)),
+
+        # Radicular / sciatica features
+        "leg_pain_worse_than_back": yn(rf.get("leg_pain_worse_than_back", "No")),
+        "dermatomal_distribution": yn(rf.get("dermatomal_distribution", "No")),
+        "positive_slr": yn(rf.get("positive_slr", "No")),
+        "sensory_changes": yn(rf.get("sensory_changes", "No")),
+        "motor_weakness_radicular": yn(rf.get("motor_weakness_radicular", "No")),
+        "reflex_changes": yn(rf.get("reflex_changes", "No")),
+
         "progressive_leg_weakness": yn(rf.get("neuro_deficit", "No")),
         "bilateral_leg_weakness": False,  # UI does not yet collect this
         "no_relief_when_lying_down": yn(rf.get("night_pain", "No")),

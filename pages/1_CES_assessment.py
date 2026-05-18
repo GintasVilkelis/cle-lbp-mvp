@@ -12,17 +12,13 @@ if image_path.exists():
 else:
     st.info("Saddle area diagram will appear here once added.")
 
-audio_path = Path(__file__).parent.parent / "assets" / "neuro_symptoms_explainer.mp3"
-if audio_path.exists():
-    st.audio(str(audio_path))
-else:
-    st.info("Audio explanation of neurological symptoms will appear here once added.")
-
+# The below audio points to assets/audio/ces_explainer.mp3, which should be a concise explanation of CES red flags and urgency. This is separate from the general neuro symptoms explainer above, which can cover a broader range of symptoms and conditions.
+# This is a different folder than what actually exists
 audio_path = Path(__file__).parent.parent / "assets" / "audio" / "ces_explainer.mp3"
 if audio_path.exists():
     st.audio(str(audio_path))
 else:
-    st.info("Audio explanation will appear here once added.")
+    st.info("CES audio explanation will appear here once added.")
 
 st.markdown(
     "This page focuses specifically on **cauda equina red flags**. "
@@ -65,6 +61,7 @@ if submitted:
     }
 
     result = assess_low_back_pain(payload)
+    st.session_state["last_result"] = result
 
     st.subheader("Summary")
     st.write(result["summary"])

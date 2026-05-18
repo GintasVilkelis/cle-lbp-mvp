@@ -57,6 +57,7 @@ if submitted:
     }
 
     result = assess_low_back_pain(payload)
+    st.session_state["last_result"] = result
 
     st.subheader("Summary")
     st.write(result["summary"])
