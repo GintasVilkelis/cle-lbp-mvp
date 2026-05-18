@@ -6,7 +6,7 @@ st.title("Cauda Equina Syndrome (CES) Screening")
 
 from pathlib import Path
 
-image_path = Path(__file__).parent.parent / "assets" / "saddle_area_diagram.png"
+image_path = Path(__file__).parent.parent / "assets" / "diagrams" / "saddle_area_diagram.png"
 if image_path.exists():
     st.image(str(image_path), caption="Saddle area (region where numbness is concerning)")
 else:

@@ -5,7 +5,7 @@ st.title("Radicular Pain / Sciatica Assessment")
 
 from pathlib import Path
 
-image_path = Path(__file__).parent.parent / "assets" / "dermatomes.webp"
+image_path = Path(__file__).parent.parent / "assets" / "diagrams" /"dermatomes.webp"
 if image_path.exists():
     st.image(str(image_path), caption="Dermatomal map")
 else:
