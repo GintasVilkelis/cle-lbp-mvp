@@ -56,14 +56,17 @@ def assess_low_back_pain(payload: Dict[str, Any]) -> Dict[str, Any]:
     # }
 
     response: Dict[str, Any] = {
-        "summary": engine_result.get("summary", ""),
-        "red_flags": engine_result.get("red_flags", []),
-        "conditions": engine_result.get("conditions", []),
-        "question_explanations": engine_result.get("question_explanations", None)
+    "summary": engine_result.get("summary", ""),
+    "red_flags": engine_result.get("red_flags", []),
+    "conditions": engine_result.get("conditions", []),
+    "question_explanations": engine_result.get("question_explanations", {})
     }
 
     # Later, we can extend app.py to also show:
     # - engine_result["reasoning_trace"]
     # - severity, scores, etc.
+
+    # Ensure required fields exist
+    response.setdefault("reasoning_trace", [])
 
     return response
