@@ -1,69 +1,60 @@
+from typing import Optional, Dict, Any, List
 from pydantic import BaseModel
-from typing import Dict, Any, List, Optional
 
 
-# -----------------------------
-# Request Models
-# -----------------------------
+# ---------------------------------------------------------
+# INPUT MODELS (what the frontend sends)
+# ---------------------------------------------------------
 
-class PatientModel(BaseModel):
-    age: int
-    sex: str
-
-
-class PainModel(BaseModel):
-    duration: str
-    onset: str
-    location: str
+class PatientInfo(BaseModel):
+    age: Optional[int] = None
+    sex: Optional[str] = None   # "male" | "female" | "other"
 
 
-class RedFlagsModel(BaseModel):
-    # CES fields (may come from CES page or main app page)
-    urinary_retention: Optional[str] = None
-    urinary_incontinence: Optional[str] = None
-    saddle_anaesthesia: Optional[str] = None
-    bowel_incontinence: Optional[str] = None
-
-    # Combined field from main app page
-    bladder_bowel: Optional[str] = None
-
-    # Radicular fields
-    leg_pain_worse_than_back: Optional[str] = None
-    dermatomal_distribution: Optional[str] = None
-    positive_slr: Optional[str] = None
-    sensory_changes: Optional[str] = None
-    motor_weakness_radicular: Optional[str] = None
-    reflex_changes: Optional[str] = None
+class PainInfo(BaseModel):
+    duration: Optional[str] = None
+    onset: Optional[str] = None
+    location: Optional[str] = None
 
 
 class AssessmentRequest(BaseModel):
-    mode: str
-    patient: PatientModel
-    pain: PainModel
-    red_flags: RedFlagsModel
+    """
+    This matches EXACTLY what the React frontend sends.
+    It also matches what backend.engine.assess_low_back_pain expects.
+    """
+    mode: str                       # "consumer" | "pro" | "teaching"
+    patient: Dict[str, Any]         # { age, sex }
+    pain: Dict[str, Any]            # { duration, onset, location }
+    red_flags: Dict[str, Any]       # all red flag answers
 
 
-# -----------------------------
-# Response Models
-# -----------------------------
+# ---------------------------------------------------------
+# OUTPUT MODELS (what the backend returns)
+# ---------------------------------------------------------
 
-class RedFlagOutput(BaseModel):
+class RedFlag(BaseModel):
     code: str
     label: str
-    reason: str
+    reason: Optional[str] = None
 
 
-class ConditionOutput(BaseModel):
+class Condition(BaseModel):
     code: str
     name: str
-    likelihood: str
-    reasons: List[str]
-    routing: Dict[str, Any]
+    likelihood: Optional[str] = None
+    reasons: Optional[List[str]] = None
+    routing: Optional[Dict[str, Any]] = None
+    severity: Optional[int] = None
+    score: Optional[float] = None
 
 
 class AssessmentResponse(BaseModel):
+    """
+    This matches EXACTLY what backend.engine.assess_low_back_pain returns.
+    It also matches what the React Results page expects.
+    """
     summary: str
-    red_flags: List[RedFlagOutput]
-    conditions: List[ConditionOutput]
-    reasoning_trace: List[str]
-    question_explanations: Dict[str, Any]
+    red_flags: List[RedFlag]
+    conditions: List[Condition]
+    question_explanations: Dict[str, Any] = {}
+    reasoning_trace: List[Any] = []
