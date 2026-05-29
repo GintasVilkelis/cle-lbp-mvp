@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.models import AssessmentRequest, AssessmentResponse
-from engine import assess_low_back_pain
+from backend.engine import assess_low_back_pain
 
 app = FastAPI(
     title="CLE Low Back Pain API",
