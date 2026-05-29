@@ -84,6 +84,31 @@ export default function ConsumerQuestionPage() {
 
         {/* For now: simple buttons for options */}
         <div>
+          {question.type === "number" ? (
+            <input
+              type="number"
+              value={answers[question.id] ?? ""}
+              onChange={e => handleAnswer(e.target.value)}
+              style={{ padding: "0.5rem", fontSize: "1rem", width: "200px" }}
+            />
+          ) : (
+            question.options.map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => handleAnswer(opt.value)}
+                style={{
+                  display: "block",
+                  marginBottom: "0.5rem",
+                  padding: "0.75rem",
+                  width: "100%",
+                  textAlign: "left"
+                }}
+              >
+                {opt.label}
+              </button>
+            ))
+          )}
+
           {question.options.map(opt => (
             <button
               key={opt.value}

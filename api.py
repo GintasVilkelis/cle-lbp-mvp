@@ -4,8 +4,12 @@ from engine import assess_low_back_pain
 
 app = FastAPI(title="CLE LBP API")
 
-
-@app.post("/api/lbp/assess", response_model=LBPResponse)
+@app.post("/lbp-assessment", response_model=LBPResponse)
 def assess_lbp(payload: LBPRequest):
-    result = assess_low_back_pain(payload.dict())
+    # Convert Pydantic model → dict
+    request_dict = payload.dict()
+
+    # Call your real clinical engine
+    result = assess_low_back_pain(request_dict)
+
     return result
