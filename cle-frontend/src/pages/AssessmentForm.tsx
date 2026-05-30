@@ -8,7 +8,7 @@ export default function AssessmentForm() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState<AssessmentRequest>({
-    mode: "teaching",
+    mode: "pro",
     patient: {
       age: 45,
       sex: "Other"
@@ -19,26 +19,26 @@ export default function AssessmentForm() {
       location: "Central"
     },
     red_flags: {
-      urinary_retention: "No",
-      urinary_incontinence: "No",
-      bowel_incontinence: "No",
-      saddle_anaesthesia: "No",
-      bilateral_leg_weakness: "No",
-      progressive_leg_weakness: "No",
+      urinary_retention: false,
+      urinary_incontinence: false,
+      bowel_incontinence: false,
+      saddle_anaesthesia: false,
+      bilateral_leg_weakness: false,
+      progressive_leg_weakness: false,
 
-      fever: "No",
-      recent_infection: "No",
-      IV_drug_use: "No",
-      immunosuppression: "No",
+      fever: false,
+      recent_infection: false,
+      IV_drug_use: false,
+      immunosuppression: false,
 
-      history_of_cancer: "No",
-      unexplained_weight_loss: "No",
-      night_pain: "No",
+      history_of_cancer: false,
+      unexplained_weight_loss: false,
+      night_pain: false,
 
-      recent_trauma: "No",
-      osteoporosis: "No",
-      prolonged_steroid_use: "No",
-      age_over_70: "No"
+      recent_trauma: false,
+      osteoporosis: false,
+      prolonged_steroid_use: false,
+      age_over_70: false
     }
   });
 
@@ -146,13 +146,21 @@ export default function AssessmentForm() {
               <div key={field.key} style={{ marginBottom: "0.5rem" }}>
                 <label>{field.label}: </label>
                 <select
-                value={form.red_flags[field.key as keyof AssessmentRequest["red_flags"]]}
-                onChange={e =>
-                    update("red_flags", field.key, e.target.value)
-                }
+                  value={
+                    form.red_flags[field.key as keyof AssessmentRequest["red_flags"]]
+                      ? "true"
+                      : "false"
+                  }
+                  onChange={e =>
+                    update(
+                      "red_flags",
+                      field.key,
+                      e.target.value === "true"
+                    )
+                  }
                 >
-                  <option value="No">No</option>
-                  <option value="Yes">Yes</option>
+                  <option value="false">No</option>
+                  <option value="true">Yes</option>
                 </select>
               </div>
             ))}

@@ -1,66 +1,76 @@
-import type { AssessmentRequest } from "../types/assessment";
 import type { ConsumerQuestion } from "../types/questions";
+import type { AssessmentRequest } from "../types/assessment";
 
+/**
+ * Convert Consumer Edition answers into the AssessmentRequest
+ * expected by the backend NICE engine.
+ */
 export function mapConsumerAnswersToAssessment(
-    answers: Record<string, any>,
-    questions: ConsumerQuestion[]
+  answers: Record<string, string>,
+  _questions: ConsumerQuestion[]
 ): AssessmentRequest {
-    // Start with default structure
-    const result: AssessmentRequest = {
-        mode: "teaching",
-        patient: {
-            age: 0,
-            sex: "Other"
-        },
-        pain: {
-            duration: "< 6 weeks",
-            onset: "Gradual",
-            location: "Central"
-        },
-        red_flags: {
-            urinary_retention: "No",
-            urinary_incontinence: "No",
-            bowel_incontinence: "No",
-            saddle_anaesthesia: "No",
-            bilateral_leg_weakness: "No",
-            progressive_leg_weakness: "No",
+  // Helper: convert "yes"/"no" → boolean
+  const toBool = (v: string | undefined): boolean => {
+    if (!v) return false;
+    const s = v.trim().toLowerCase();
+    return s === "yes" || s === "true";
+  };
 
-            fever: "No",
-            recent_infection: "No",
-            IV_drug_use: "No",
-            immunosuppression: "No",
+  // Extract values by question ID
+  const get = (id: string): string | undefined => answers[id];
 
-            history_of_cancer: "No",
-            unexplained_weight_loss: "No",
-            night_pain: "No",
+  // -------------------------------
+  // PATIENT SECTION
+  // -------------------------------
+  const patient = {
+    age: Number(get("age")) || 0,
+    sex: get("sex") || "Other"
+  };
 
-            recent_trauma: "No",
-            osteoporosis: "No",
-            prolonged_steroid_use: "No",
-            age_over_70: "No"
-        }
-    };
+  // -------------------------------
+  // PAIN SECTION
+  // -------------------------------
+  const pain = {
+    duration: get("pain_duration") || "< 6 weeks",
+    onset: get("pain_onset") || "Gradual",
+    location: get("pain_location") || "Central"
+  };
 
-    // Apply mappings from each question
-    for (const q of questions) {
-        const answer = answers[q.id];
-        if (answer === undefined) continue;
+  // -------------------------------
+  // RED FLAGS SECTION
+  // -------------------------------
+  const red_flags = {
+    urinary_retention: toBool(get("urinary_retention")),
+    urinary_incontinence: toBool(get("urinary_incontinence")),
+    bowel_incontinence: toBool(get("bowel_incontinence")),
+    saddle_anaesthesia: toBool(get("saddle_anaesthesia")),
+    bilateral_leg_weakness: toBool(get("bilateral_leg_weakness")),
+    progressive_leg_weakness: toBool(get("progressive_leg_weakness")),
 
-        if (q.maps_to) {
-            const { section, field } = q.maps_to as {
-                section: "patient" | "pain" | "red_flags";
-                field: string;
-            };
+    fever: toBool(get("fever")),
+    recent_infection: toBool(get("recent_infection")),
+    IV_drug_use: toBool(get("IV_drug_use")),
+    immunosuppression: toBool(get("immunosuppression")),
 
-            if (section === "patient") {
-                (result.patient as any)[field] = q.type === "number" ? Number(answer) : answer;
-            } else if (section === "pain") {
-                (result.pain as any)[field] = answer;
-            } else if (section === "red_flags") {
-                (result.red_flags as any)[field] = answer;
-            }
-        }
-    }
+    history_of_cancer: toBool(get("history_of_cancer")),
+    unexplained_weight_loss: toBool(get("unexplained_weight_loss")),
+    night_pain: toBool(get("night_pain")),
 
-    return result;
+    recent_trauma: toBool(get("recent_trauma")),
+    osteoporosis: toBool(get("osteoporosis")),
+    prolonged_steroid_use: toBool(get("prolonged_steroid_use")),
+    age_over_70: toBool(get("age_over_70"))
+  };
+
+  // -------------------------------
+  // FINAL STRUCTURE
+  // -------------------------------
+  const request: AssessmentRequest = {
+    mode: "consumer",
+    patient,
+    pain,
+    red_flags
+  };
+
+  return request;
 }

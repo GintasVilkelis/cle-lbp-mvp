@@ -1,111 +1,127 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import type { AssessmentResponse } from "../types/assessment";
 
 export default function ResultsPage() {
-  const navigate = useNavigate();
   const location = useLocation();
+  const navigate = useNavigate();
 
-  const result = location.state as AssessmentResponse | undefined;
+  // The backend result is passed via React Router state
+  const result = location.state;
 
   if (!result) {
     return (
       <div style={{ padding: "2rem" }}>
-        <h1>No Results</h1>
-        <p>No assessment data was provided.</p>
-        <button onClick={() => navigate("/")}>Back to Assessment</button>
+        <h2>No results available</h2>
+        <p>The assessment did not return any data.</p>
+        <button onClick={() => navigate("/")}>Start Again</button>
       </div>
     );
   }
 
+  const {
+    summary,
+    red_flags = [],
+    conditions = [],
+    question_explanations = {},
+    reasoning_trace = []
+  } = result;
+
   return (
-    <div style={{ padding: "2rem", maxWidth: "900px" }}>
+    <div style={{ padding: "2rem", maxWidth: "800px", margin: "0 auto" }}>
       <h1>Assessment Results</h1>
 
-      {/* Summary */}
+      {/* SUMMARY */}
       <section style={{ marginBottom: "2rem" }}>
         <h2>Summary</h2>
-        <p>{result.summary}</p>
+        <p>{summary || "No summary available."}</p>
       </section>
 
-      {/* Red Flags */}
+      {/* RED FLAGS */}
       <section style={{ marginBottom: "2rem" }}>
         <h2>Red Flags</h2>
-        {result.red_flags.length === 0 ? (
+        {red_flags.length === 0 ? (
           <p>No red flags detected.</p>
         ) : (
           <ul>
-            {result.red_flags.map((rf, idx) => (
-              <li key={idx}>{rf}</li>
+            {red_flags.map((rf: any, idx: number) => (
+              <li key={idx}>
+                <strong>{rf.label}</strong>
+                {rf.reason && <p>{rf.reason}</p>}
+              </li>
             ))}
           </ul>
         )}
       </section>
 
-      {/* Conditions */}
+      {/* CONDITIONS */}
       <section style={{ marginBottom: "2rem" }}>
-        <h2>Conditions</h2>
-
-        {result.conditions.length === 0 ? (
-          <p>No conditions identified.</p>
+        <h2>Possible Conditions</h2>
+        {conditions.length === 0 ? (
+          <p>No conditions detected.</p>
         ) : (
-          result.conditions.map(cond => (
+          conditions.map((cond: any, idx: number) => (
             <div
-              key={cond.code}
+              key={idx}
               style={{
                 border: "1px solid #ccc",
                 padding: "1rem",
                 marginBottom: "1rem",
-                borderRadius: "6px"
+                borderRadius: "8px"
               }}
             >
               <h3>{cond.name}</h3>
               <p>
-                <strong>Likelihood:</strong> {cond.likelihood}
+                <strong>Likelihood:</strong> {cond.likelihood || "unknown"}
               </p>
 
-              <p>
-                <strong>Routing:</strong> {cond.routing.level} —{" "}
-                {cond.routing.description}
-              </p>
+              {cond.reasons && cond.reasons.length > 0 && (
+                <>
+                  <strong>Reasons:</strong>
+                  <ul>
+                    {cond.reasons.map((r: string, i: number) => (
+                      <li key={i}>{r}</li>
+                    ))}
+                  </ul>
+                </>
+              )}
 
-              <div>
-                <strong>Reasons:</strong>
-                <ul>
-                  {cond.reasons.map((r, idx) => (
-                    <li key={idx}>{r}</li>
-                  ))}
-                </ul>
-              </div>
+              {cond.routing && (
+                <>
+                  <strong>Recommended Action:</strong>
+                  <p>
+                    {cond.routing.level}: {cond.routing.description}
+                  </p>
+                </>
+              )}
             </div>
           ))
         )}
       </section>
 
-      {/* Reasoning Trace */}
+      {/* REASONING TRACE */}
       <section style={{ marginBottom: "2rem" }}>
-        <h2>Reasoning Trace</h2>
-        {result.reasoning_trace.length === 0 ? (
-          <p>No reasoning trace provided.</p>
+        <h2>Clinical Reasoning Trace</h2>
+        {reasoning_trace.length === 0 ? (
+          <p>No reasoning trace available.</p>
         ) : (
-          <ol>
-            {result.reasoning_trace.map((step, idx) => (
+          <ul>
+            {reasoning_trace.map((step: any, idx: number) => (
               <li key={idx}>{step}</li>
             ))}
-          </ol>
+          </ul>
         )}
       </section>
 
-      {/* Question Explanations */}
+      {/* QUESTION EXPLANATIONS */}
       <section style={{ marginBottom: "2rem" }}>
         <h2>Question Explanations</h2>
-        {Object.keys(result.question_explanations).length === 0 ? (
-          <p>No explanations provided.</p>
+        {Object.keys(question_explanations).length === 0 ? (
+          <p>No explanations available.</p>
         ) : (
           <ul>
-            {Object.entries(result.question_explanations).map(
-              ([key, explanation]) => (
-                <li key={key}>
-                  <strong>{key}:</strong> {explanation}
+            {Object.entries(question_explanations).map(
+              ([qid, explanation]: any) => (
+                <li key={qid}>
+                  <strong>{qid}:</strong> {explanation}
                 </li>
               )
             )}
@@ -113,7 +129,7 @@ export default function ResultsPage() {
         )}
       </section>
 
-      <button onClick={() => navigate("/")}>Back to Assessment</button>
+      <button onClick={() => navigate("/")}>Start New Assessment</button>
     </div>
   );
 }
