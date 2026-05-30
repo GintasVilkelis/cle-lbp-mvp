@@ -24,19 +24,28 @@ export interface AssessmentRequest {
     bilateral_leg_weakness: boolean;
     progressive_leg_weakness: boolean;
 
+    leg_pain_worse_than_back: boolean;
+    dermatomal_distribution: boolean;
+    positive_slr: boolean;
+    sensory_changes: boolean;
+    motor_weakness_radicular: boolean;
+    reflex_changes: boolean;
+
+    no_relief_when_lying_down: boolean;
+
     fever: boolean;
     recent_infection: boolean;
-    IV_drug_use: boolean;
-    immunosuppression: boolean;
+    iv_drug_use: boolean;
+    immunosuppressed: boolean;
 
     history_of_cancer: boolean;
     unexplained_weight_loss: boolean;
     night_pain: boolean;
+    pain_at_rest: boolean;
 
-    recent_trauma: boolean;
-    osteoporosis: boolean;
-    prolonged_steroid_use: boolean;
-    age_over_70: boolean;
+    significant_trauma: boolean;
+    minor_trauma_osteoporosis: boolean;
+    long_term_steroids: boolean;
   };
 }
 

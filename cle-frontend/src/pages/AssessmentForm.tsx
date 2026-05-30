@@ -26,19 +26,28 @@ export default function AssessmentForm() {
       bilateral_leg_weakness: false,
       progressive_leg_weakness: false,
 
+      leg_pain_worse_than_back: false,
+      dermatomal_distribution: false,
+      positive_slr: false,
+      sensory_changes: false,
+      motor_weakness_radicular: false,
+      reflex_changes: false,
+
+      no_relief_when_lying_down: false,
+
       fever: false,
       recent_infection: false,
-      IV_drug_use: false,
-      immunosuppression: false,
+      iv_drug_use: false,
+      immunosuppressed: false,
 
       history_of_cancer: false,
       unexplained_weight_loss: false,
       night_pain: false,
+      pain_at_rest: false,
 
-      recent_trauma: false,
-      osteoporosis: false,
-      prolonged_steroid_use: false,
-      age_over_70: false
+      significant_trauma: false,
+      minor_trauma_osteoporosis: false,
+      long_term_steroids: false
     }
   });
 
