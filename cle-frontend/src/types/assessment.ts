@@ -1,3 +1,7 @@
+// ---------------------------------------------------------
+// INPUT MODEL (what the frontend sends to backend)
+// ---------------------------------------------------------
+
 export interface AssessmentRequest {
   mode: string;
 
@@ -35,6 +39,10 @@ export interface AssessmentRequest {
     age_over_70: boolean;
   };
 }
+
+// ---------------------------------------------------------
+// OUTPUT MODELS (what backend returns to frontend)
+// ---------------------------------------------------------
 
 export interface RedFlag {
   code: string;
