@@ -19,11 +19,11 @@ def assess_low_back_pain(payload: Dict[str, Any]) -> Dict[str, Any]:
 
     # Adapt engine output → API response format
     response: Dict[str, Any] = {
-        "summary": engine_result.get("summary", ""),
-        "red_flags": engine_result.get("red_flags", []),
-        "conditions": engine_result.get("conditions", []),
-        "question_explanations": engine_result.get("question_explanations", {}),
-        "reasoning_trace": engine_result.get("reasoning_trace", [])
+    "summary": engine_result.get("summary", ""),
+    "red_flags": engine_result.get("red_flags", []),
+    "conditions": engine_result.get("conditions", []),
+    "question_explanations": engine_result.get("question_explanations") or {},
+    "reasoning_trace": engine_result.get("reasoning_trace") or []
     }
-
+    
     return response
